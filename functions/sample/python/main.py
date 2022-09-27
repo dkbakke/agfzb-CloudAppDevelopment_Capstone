@@ -12,29 +12,30 @@
 from ibmcloudant.cloudant_v1 import CloudantV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_cloud_sdk_core import ApiException
-
 import requests
 
 
 def main(dict):
-    database_name = "dealerships"
-
-    print(dict)
+    database_name = "reviews"
+    doc_result =  {}
+    
     try:
         authenticator = IAMAuthenticator(dict["IAM_API_KEY"])
         service = CloudantV1(authenticator=authenticator)
         service.set_service_url(dict["COUCH_URL"])
     
-        print("Databases:\n",service.get_all_dbs().get_result())
+        #print("Databases:\n",service.get_all_dbs().get_result())
         
         #doc_result = service.get_document(db=database_name,doc_id=doc_key).get_result()
         
         # use post_find with a seletor?
-        my_selector = {"short_name": "Holdlamis"}
+        #my_selector =  {"id": 1}
 
+        my_selector =  {"dealership": dict["dealerId"]}
+        
         doc_result = service.post_find(db=database_name,selector=my_selector).get_result()
         
-        print("Document: ", doc_result )
+        #print("Document: ", doc_result )
         
     except ApiException as ae:
         print("Method failed")
@@ -46,5 +47,5 @@ def main(dict):
     except (requests.exceptions.RequestException, ConnectionResetError) as err:
         print("connection error")
         return {"error": err}
-    print("No exceptions")
-    return {"dbs": service.get_all_dbs().get_result()}
+    #print("No exceptions")
+    return { "reviews" : doc_result["docs"] }
