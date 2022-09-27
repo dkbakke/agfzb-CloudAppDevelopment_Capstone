@@ -7,26 +7,36 @@
 # @return The output of this action, which must be a JSON object.
 #
 #
-from cloudant.client import Cloudant
-from cloudant.error import CloudantException
+# from cloudant.client import Cloudant - out-of-date
+# from cloudant.error import CloudantException - out-of-date
+from ibmcloudant.cloudant_v1 import CloudantV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_cloud_sdk_core import ApiException
+
 import requests
 
 
 def main(dict):
-    databaseName = "dealerships"
+    database_name = "dealerships"
 
+    print(dict)
     try:
-        client = Cloudant.iam(
-            account_name=dict["COUCH_USERNAME"],
-            api_key=dict["IAM_API_KEY"],
-            connect=True,
-        )
-        print("Databases: {0}".format(client.all_dbs()))
-    except CloudantException as ce:
-        print("unable to connect")
-        return {"error": ce}
+        authenticator = IAMAuthenticator(dict["IAM_API_KEY"])
+        service = CloudantV1(authenticator=authenticator)
+        service.set_service_url(dict["COUCH_URL"])
+    
+        print("Databases:\n",service.get_all_dbs().get_result())
+        print("Document? in " + database_name + ":\n", service.get_document(database_name,"1").get_result())
+        
+    except ApiException as ae:
+        print("Method failed")
+        print(" - status code: " + str(ae.code))
+        print(" - error message: " + ae.message)
+        if ("reason" in ae.http_response.json()):
+            print(" - reason: " + ae.http_response.json()["reason"])
+        return {"apiexception": ae.message}    
     except (requests.exceptions.RequestException, ConnectionResetError) as err:
         print("connection error")
         return {"error": err}
-
-    return {"dbs": client.all_dbs()}
+    print("No exceptions")
+    return {"dbs": service.get_all_dbs().get_result()}
