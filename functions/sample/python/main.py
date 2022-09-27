@@ -26,7 +26,15 @@ def main(dict):
         service.set_service_url(dict["COUCH_URL"])
     
         print("Databases:\n",service.get_all_dbs().get_result())
-        print("Document? in " + database_name + ":\n", service.get_document(database_name,"1").get_result())
+        
+        #doc_result = service.get_document(db=database_name,doc_id=doc_key).get_result()
+        
+        # use post_find with a seletor?
+        my_selector = {"short_name": "Holdlamis"}
+
+        doc_result = service.post_find(db=database_name,selector=my_selector).get_result()
+        
+        print("Document: ", doc_result )
         
     except ApiException as ae:
         print("Method failed")
