@@ -3,12 +3,15 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import CarMake,CarModel,CarDealer
-from .restapis import get_dealers_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+
+GET_DEALERSHIP_URL = "https://us-east.functions.appdomain.cloud/api/v1/web/FSClouddkb_myCloudSpace/capstone/get_dealerships"
+GET_DEALER_REVIEWS_URL = "https://us-east.functions.appdomain.cloud/api/v1/web/FSClouddkb_myCloudSpace/capstone/get_reviews"
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -88,7 +91,8 @@ def logout_request(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
-        url = "your-cloud-function-domain/dealerships/dealer-get"
+        #url = "your-cloud-function-domain/dealerships/dealer-get"
+        url = GET_DEALERSHIP_URL
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
@@ -99,6 +103,19 @@ def get_dealerships(request):
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
+
+def get_dealer_details(request,dealer_id):
+    if request.method == "GET":
+        #url = "your-cloud-function-domain/dealerships/dealer-get"
+        url = GET_DEALER_REVIEWS_URL
+        # Get dealers from the URL
+        dealer_reviews = get_dealer_reviews_from_cf( url, dealer_id )
+        # Return a list of reviews
+        return HttpResponse(dealer_reviews)
+
+
+
+
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
