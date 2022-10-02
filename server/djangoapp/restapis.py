@@ -11,13 +11,26 @@ def get_request(url, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
     response = {}
+    api_key = kwargs["api_key"]
     try:
-        # Call get method of requests library with URL and parameters
-        response = requests.get(url, headers={'Content-Type': 'application/json'},
-                                    params=kwargs)
+    # Call get method of requests library with URL and parameters
+        if ( api_key ):
+            # Basic authentication GET
+            response = requests.get(url, 
+                headers={'Content-Type': 'application/json'},
+                params=kwargs,
+                auth=HTTPBasicAuth('apikey', api_key)
+                )
+        else:
+            # no authentication GET
+            response = requests.get(url,
+                 headers={'Content-Type': 'application/json'},
+                params=kwargs
+                )
     except:
         # If any error occurs
         print("Network exception occurred")
+    # TODO Need more error checking
     status_code = response.status_code
     print("With status {} ".format(status_code))
     json_data = json.loads(response.text)
@@ -27,6 +40,34 @@ def get_request(url, **kwargs):
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 
+def post_request(url, json_payload, **kwargs):
+    print(kwargs)
+    print(json_payload)
+    print("POST to {} ".format(url))
+    response = {}
+    api_key = kwargs["api_key"]
+    try:
+    # Call get method of requests library with URL and parameters
+        if ( api_key ):
+            # Authenticated POST
+            response = requests.post(url, 
+                params=kwargs,
+                json=json_payload,
+                auth=HTTPBasicAuth('apikey', api_key)
+                )
+        else:
+            # Not authenticated POST
+            response = requests.post(url, 
+                params=kwargs,
+                json=json_payload
+                )
+    except:
+        # If any error occurs
+        print("Network exception occurred")
+    # TODO Need more error checking
+    status_code = response.status_code
+    print("With status {} ".format(status_code))
+    return response
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
 # def get_dealers_from_cf(url, **kwargs):
@@ -82,7 +123,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                 car_model = review_doc["car_model"],
                 car_year = review_doc["car_year"],
                 review_id = review_doc["id"],
-                sentiment=""
+                sentiment= analyze_review_sentiments(review_doc["review"])
             )
             results.append(review_obj)
 
@@ -93,6 +134,24 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+
+def analyze_review_sentiments(review):
+    json_results = []
+    # Call get_request with a URL parameter and api_key
+    params = dict()
+    params["text"] = review
+    #params["version"] = kwargs["version"]
+    #params["features"] = kwargs["features"]
+    #params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+    json_result = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                                    auth=HTTPBasicAuth('apikey', api_key))
+
+    print( json_result)
+    if json_result:
+        # Get the sentiment of the review in json_result
+        sentimnet_result = json_result
+        
+    return sentiment_result
 
 
 

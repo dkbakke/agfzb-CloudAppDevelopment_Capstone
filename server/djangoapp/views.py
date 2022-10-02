@@ -121,3 +121,33 @@ def get_dealer_details(request,dealer_id):
 # def add_review(request, dealer_id):
 # ...
 
+def add_review(request, dealer_id):
+    
+    # Check user authentication
+    context = {}
+    username = request.POST['username']
+    password = request.POST['psw']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return redirect('djangoapp:index')
+    else:
+        context['message'] = "Invalid username or password."
+        return render(request, 'djangoapp/login.html', context)
+    else:
+        return render(request, 'djangoapp/login.html', context)
+    
+    review = {}
+    # Test review 
+    review["time"] = datetime.utcnow().isoformat()
+    review["dealership"] = 11
+    review["review"] = "This is a great car dealer"
+
+    json_paload = {}
+    json_payload["review"] = review
+
+    response = post_request(url, json_payload, dealerId=dealer_id)
+
+    #return render(request, , context)
+
+
