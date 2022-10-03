@@ -48,22 +48,14 @@ def post_request(url, json_payload, **kwargs):
     print(json_payload)
     print("POST to {} ".format(url))
     response = {}
-    api_key = kwargs["api_key"]
+    
     try:
     # Call get method of requests library with URL and parameters
-        if ( api_key ):
-            # Authenticated POST
-            response = requests.post(url, 
-                params=kwargs,
-                json=json_payload,
-                auth=HTTPBasicAuth('apikey', api_key)
-                )
-        else:
             # Not authenticated POST
-            response = requests.post(url, 
-                params=kwargs,
-                json=json_payload
-                )
+        response = requests.post(url, 
+            params=kwargs,
+            json=json_payload
+            )
     except:
         # If any error occurs
         print("Network exception occurred")

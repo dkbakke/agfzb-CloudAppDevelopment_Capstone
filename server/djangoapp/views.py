@@ -127,30 +127,21 @@ def add_review(request, dealer_id):
     url = ADD_REVIEW_URL
 
     # Check user authentication
-    context = {}
-    #username = request.POST['username']
-    #password = request.POST['psw']
-    #user = authenticate(username=username, password=password)
-    #if user is not None:
-    #    login(request, user)
-    #    return redirect('djangoapp:index')
-    #else:
-    #    context['message'] = "Invalid username or password."
-    #    return render(request, 'djangoapp/login.html', context)
-    #else:
-    #    return render(request, 'djangoapp/login.html', context)
+    if ( request.user.is_authenticated):
+        # Test review 
+        review = {}
+        review["time"] = datetime.utcnow().isoformat()
+        review["dealership"] = 11
+        review["review"] = "STUPENDOUS CAR DEALERHIP"
+
+        json_payload = {}
+        json_payload["review"] = review
+
+        response = post_request(url, json_payload, dealerId=dealer_id)
+
+        return HttpResponse(response)
+    else:
+        return redirect('djangoapp:index')
     
-    review = {}
-    # Test review 
-    review["time"] = datetime.utcnow().isoformat()
-    review["dealership"] = 11
-    review["review"] = "This is a great car dealer"
-
-    json_payload = {}
-    json_payload["review"] = review
-
-    response = post_request(url, json_payload, dealerId=dealer_id)
-
-    return render(request,response , context)
-
+    
 
