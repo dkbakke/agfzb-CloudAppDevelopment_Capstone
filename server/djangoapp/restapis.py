@@ -3,6 +3,8 @@ import json
 from .models import CarMake,CarModel,CarDealer,DealerReview
 from requests.auth import HTTPBasicAuth
 
+
+
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
@@ -11,29 +13,30 @@ def get_request(url, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
     response = {}
-    api_key = kwargs["api_key"]
     try:
-    # Call get method of requests library with URL and parameters
-        if ( api_key ):
+        if ( "api_key" in kwargs ):
             # Basic authentication GET
+            api_key = kwargs["api_key"]
             response = requests.get(url, 
                 headers={'Content-Type': 'application/json'},
                 params=kwargs,
                 auth=HTTPBasicAuth('apikey', api_key)
                 )
-        else:
+        else:  
             # no authentication GET
             response = requests.get(url,
-                 headers={'Content-Type': 'application/json'},
-                params=kwargs
-                )
+                headers={'Content-Type': 'application/json'},
+                params=kwargs )
     except:
         # If any error occurs
         print("Network exception occurred")
+
+
     # TODO Need more error checking
     status_code = response.status_code
     print("With status {} ".format(status_code))
     json_data = json.loads(response.text)
+    print( json_data )
     return json_data
 
     
@@ -136,22 +139,33 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # - Get the returned sentiment label such as Positive or Negative
 
 def analyze_review_sentiments(review):
-    json_results = []
+
+    ANALYZE_SENTIMENT_URL="https://api.us-east.natural-language-understanding.watson.cloud.ibm.com/instances/d30e1795-7de3-4ea9-ba4a-5707519aa8d1/v1/analyze"
+    ANALYZE_SENTIMENT_API_KEY="zHUYbL0Dtd4FSZydLXr2X9dP-ys1jxW0H6htT7nGaXdg"
+    NLU_VERSION="2022-04-07"
+    NLU_FEATURES={                 
+                    "keywords": 
+                        {
+                        "sentiment": True,
+                        "limit": 1
+                        }
+                   
+                }
+
+    url=ANALYZE_SENTIMENT_URL
+    api_key=ANALYZE_SENTIMENT_API_KEY
     # Call get_request with a URL parameter and api_key
     params = dict()
     params["text"] = review
-    #params["version"] = kwargs["version"]
-    #params["features"] = kwargs["features"]
-    #params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+    params["version"] = NLU_VERSION
+    params["features"] = NLU_FEATURES
+    #params["return_analyzed_text"] = ???
     json_result = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
                                     auth=HTTPBasicAuth('apikey', api_key))
 
     print( json_result)
-    if json_result:
-        # Get the sentiment of the review in json_result
-        sentimnet_result = json_result
-        
-    return sentiment_result
+    return json_result
+    
 
 
 

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import CarMake,CarModel,CarDealer
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf,post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -12,6 +12,7 @@ import json
 
 GET_DEALERSHIP_URL = "https://us-east.functions.appdomain.cloud/api/v1/web/FSClouddkb_myCloudSpace/capstone/get_dealerships"
 GET_DEALER_REVIEWS_URL = "https://us-east.functions.appdomain.cloud/api/v1/web/FSClouddkb_myCloudSpace/capstone/get_reviews"
+ADD_REVIEW_URL = "https://us-east.functions.appdomain.cloud/api/v1/web/FSClouddkb_myCloudSpace/capstone/post_review"
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -123,19 +124,21 @@ def get_dealer_details(request,dealer_id):
 
 def add_review(request, dealer_id):
     
+    url = ADD_REVIEW_URL
+
     # Check user authentication
     context = {}
-    username = request.POST['username']
-    password = request.POST['psw']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return redirect('djangoapp:index')
-    else:
-        context['message'] = "Invalid username or password."
-        return render(request, 'djangoapp/login.html', context)
-    else:
-        return render(request, 'djangoapp/login.html', context)
+    #username = request.POST['username']
+    #password = request.POST['psw']
+    #user = authenticate(username=username, password=password)
+    #if user is not None:
+    #    login(request, user)
+    #    return redirect('djangoapp:index')
+    #else:
+    #    context['message'] = "Invalid username or password."
+    #    return render(request, 'djangoapp/login.html', context)
+    #else:
+    #    return render(request, 'djangoapp/login.html', context)
     
     review = {}
     # Test review 
@@ -143,11 +146,11 @@ def add_review(request, dealer_id):
     review["dealership"] = 11
     review["review"] = "This is a great car dealer"
 
-    json_paload = {}
+    json_payload = {}
     json_payload["review"] = review
 
     response = post_request(url, json_payload, dealerId=dealer_id)
 
-    #return render(request, , context)
+    return render(request,response , context)
 
 
