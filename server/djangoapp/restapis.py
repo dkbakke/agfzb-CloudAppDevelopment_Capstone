@@ -10,9 +10,10 @@ from requests.auth import HTTPBasicAuth
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 
 def get_request(url, **kwargs):
-    print(kwargs)
-    print("GET from {} ".format(url))
+    #print(kwargs)
+    #print("GET from {} ".format(url))
     response = {}
+    json_data = {}
     try:
         if ( "api_key" in kwargs ):
             # Basic authentication GET
@@ -34,11 +35,12 @@ def get_request(url, **kwargs):
 
     # TODO Need more error checking
     status_code = response.status_code
-    print("With status {} ".format(status_code))
-    json_data = json.loads(response.text)
-    print( json_data )
+    #print("With status {} ".format(status_code))
+    if ( status_code == 200):
+        json_data = json.loads(response.text)
+    #print( json_data )
     return json_data
-
+    
     
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
@@ -73,7 +75,7 @@ def get_dealers_from_cf(url):
     results = []
     # Call get_request with a URL parameter
     json_result = get_request(url)
-    print( json_result)
+    print( "from_cf json_result:", json_result)
     if json_result:
         # Get the row list in JSON as dealers
         dealers = json_result
@@ -98,28 +100,26 @@ def get_dealers_from_cf(url):
 def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url,dealerId=dealer_id)
-    print( json_result)
-    if json_result:
+    reviews = get_request(url,dealerId=dealer_id)
+    #print( "json_result: ",json_result)
+    if reviews:
         # Get the row list in JSON as dealers
-        reviews = json_result
         # For each dealer object
         for review in reviews:
-            # Get its content in `doc` object
-            review_doc = review
-            # Create a DealerReview object with values in `doc` object
+            #print("review: ", review)
             review_obj = DealerReview(
-                name=review_doc["name"],
-                dealer_id=review_doc["dealership"],
-                review=review_doc["review"],
-                purchase=review_doc["purchase"],
-                purchase_date=review_doc["purchase_date"],
-                car_make = review_doc["car_make"],
-                car_model = review_doc["car_model"],
-                car_year = review_doc["car_year"],
-                review_id = review_doc["id"],
-                sentiment= analyze_review_sentiments(review_doc["review"])
+                name=review["name"],
+                dealer_id=review["dealership"],
+                review=review["review"],
+                purchase=review["purchase"],
+                purchase_date=review["purchase_date"],
+                car_make = review["car_make"],
+                car_model = review["car_model"],
+                car_year = review["car_year"],
+                review_id = review["id"],
+                sentiment= analyze_review_sentiments(review["review"])["sentiment"]["document"]["label"]
             )
+            #print( "\nsentiment:",review_obj.sentiment )
             results.append(review_obj)
 
     return results
@@ -133,31 +133,14 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 def analyze_review_sentiments(review):
 
     ANALYZE_SENTIMENT_URL="https://api.us-east.natural-language-understanding.watson.cloud.ibm.com/instances/d30e1795-7de3-4ea9-ba4a-5707519aa8d1/v1/analyze"
-    ANALYZE_SENTIMENT_API_KEY="<API-KEY>"
+    ANALYZE_SENTIMENT_API_KEY="zHUYbL0Dtd4FSZydLXr2X9dP-ys1jxW0H6htT7nGaXdg"
     NLU_VERSION="2022-04-07"
-    NLU_FEATURES={                 
-                    "keywords": 
-                        {
-                        "sentiment": True,
-                        "limit": 1
-                        }
-                   
-                }
-
-    url=ANALYZE_SENTIMENT_URL
-    api_key=ANALYZE_SENTIMENT_API_KEY
-    # Call get_request with a URL parameter and api_key
-    params = dict()
-    params["text"] = review
-    params["version"] = NLU_VERSION
-    params["features"] = NLU_FEATURES
-    #params["return_analyzed_text"] = ???
-    json_result = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-                                    auth=HTTPBasicAuth('apikey', api_key))
-
-    print( json_result)
-    return json_result
+    NLU_LANGUAGE="en"   # over-riding language detection due to 422 error
     
-
-
-
+    # Call get_request with a URL parameter and api_key
+   
+    json_data = get_request(url=ANALYZE_SENTIMENT_URL, language=NLU_LANGUAGE,api_key=ANALYZE_SENTIMENT_API_KEY,text=review,version=NLU_VERSION,
+        features="sentiment")
+    
+    #print( json_data )
+    return json_data

@@ -91,28 +91,39 @@ def logout_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
+    context = {}
     if request.method == "GET":
         #url = "your-cloud-function-domain/dealerships/dealer-get"
         url = GET_DEALERSHIP_URL
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        #dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        context["dealerships"] = dealerships
+        #print( context )
+        #return HttpResponse(dealer_names)
+        return render(request, 'djangoapp/index.html', context)
+
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
 
-def get_dealer_details(request,dealer_id):
+def get_dealer_details(request,dealer_id,short_name):
+    context = {}
+    context["dealer_id"] = dealer_id
+    context["short_name"] = short_name
+
     if request.method == "GET":
         #url = "your-cloud-function-domain/dealerships/dealer-get"
         url = GET_DEALER_REVIEWS_URL
         # Get dealers from the URL
         dealer_reviews = get_dealer_reviews_from_cf( url, dealer_id )
+        context["dealer_reviews"] = dealer_reviews
         # Return a list of reviews
-        return HttpResponse(dealer_reviews)
+        #print(context)
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 
 
@@ -124,24 +135,29 @@ def get_dealer_details(request,dealer_id):
 
 def add_review(request, dealer_id):
     
-    url = ADD_REVIEW_URL
-
-    # Check user authentication
     if ( request.user.is_authenticated):
-        # Test review 
-        review = {}
+        review = {}        
+        context = {}
+        if ( request.method == "GET" ):
+            #  query the cars with the dealer id to be reviewed. 
+            
+            # The queried cars will be used in the <select> dropdown.
+            # append the queried cars into context
+            #  call render method to render add_review.html.
+            return render(request, 'djangoapp/add_reviews.html', context)
+
+            pass
+
+        if ( request.method == "POST" ):
+            # update the json_payload["review"] to use the actual values obtained from the review form.
+            # For review time,  use some datetime.utcnow().isoformat() to convert it into ISO format to be consistent with the format in
+            # Cloudant. - For purchase, you may use car.year.strftime("%Y") to only get the year from the date field.
+            # Update return statement to redirect user to the dealer details page once the review post is done for example.
+            
+            #redirect("djangoapp:dealer_details", dealer_id=dealer_id)   
+            pass
+
+
         review["time"] = datetime.utcnow().isoformat()
-        review["dealership"] = 11
-        review["review"] = "STUPENDOUS CAR DEALERHIP"
-
-        json_payload = {}
-        json_payload["review"] = review
-
-        response = post_request(url, json_payload, dealerId=dealer_id)
-
-        return HttpResponse(response)
-    else:
-        return redirect('djangoapp:index')
-    
-    
+        
 

@@ -10,8 +10,73 @@
     <body>
 
     <!--Add a nav bar here -->
-
+      <!-- Navigation bar -->
+      <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Reviews for {{ short_name }}</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
+                    <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>        
+                </li>
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                    <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    <a class="btn btn-link" href="{% url 'djangoapp:add_review' dealer_id %}">Add Review</a>
+                </li>
+                {% else %}
+                <li>
+                    <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Username" name="username" >
+                            <input type="password" class="form-control" placeholder="Password" name="psw" >
+                            <button class="btn btn-primary" type="submit">Login</button>
+                            <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+                        </div>
+                    </form>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+   
     <!-- Add reviews as cards -->
+    <!-- Page content -->
+    {% if dealer_reviews %}
+        <div class="container-fluid">
+            <div class="row">
+                {% for review in dealer_reviews %}
+                         <div class="card" style="width: 36rem;">
+                        {% if review.sentiment == "positive"%}
+                          <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png"  width="60px" height="60px"
+                               alt="Positive image">
+                        {% elif review.sentiment == "negative" %}
+                            <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png"  width="60px" height="60px"
+                               alt="Negative image">
+                        {% else %}
+                            <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png"  width="60px" height="60px"
+                               alt="Neutral image">
+                        {% endif %}
+                          <div class="card-body bg-light">
+                            {%if review.purchase %}
+                                <h4 class="card-text">{{ review.car_make}} {{ review.car_model}}</h4>
+                                <h5 class="card-text">{{ review.car_year}}</h5>
+                            {%endif%}
+                        
+                            <p class="card-text">{{ review.review}}</p>
+                        
+                        </div>
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p>No reviews are available.</p>
+    {% endif %}
 
     </body>
 
