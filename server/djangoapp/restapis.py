@@ -133,7 +133,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 def analyze_review_sentiments(review):
 
     ANALYZE_SENTIMENT_URL="https://api.us-east.natural-language-understanding.watson.cloud.ibm.com/instances/d30e1795-7de3-4ea9-ba4a-5707519aa8d1/v1/analyze"
-    ANALYZE_SENTIMENT_API_KEY="zHUYbL0Dtd4FSZydLXr2X9dP-ys1jxW0H6htT7nGaXdg"
+    ANALYZE_SENTIMENT_API_KEY="<API-KEY>"
     NLU_VERSION="2022-04-07"
     NLU_FEATURES={                 
                     "keywords": 
