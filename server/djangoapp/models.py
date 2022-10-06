@@ -58,10 +58,10 @@ class CarModel(models.Model):
 
     def __str__(self):
         return "Model name: " + self.model_name + "," + \
-            "Model make: " + self.model_make + "," + \
-            "Dealer ID: " + self.dealer_id + "," + \
+            "Model make: " + self.model_make.make_name + "," + \
+            "Dealer ID: " + str(self.dealer_id) + "," + \
             "Vehicle type: " + self.vehicle_type+ "," + \
-            "Model year: " + self.model_year
+            "Model year: " + str(self.model_year)
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
 
