@@ -143,7 +143,8 @@ def add_review(request, dealer_id, short_name):
         if ( request.method == "GET" ):
             #  query the cars with the dealer id to be reviewed. 
             
-            car_models = get_list_or_404(CarModel, pk=dealer_id)
+            car_models = CarModel.objects.filter(dealer_id=dealer_id)
+            #get(dealer_id=dealer_id)
             print( car_models )
             context["cars"] = car_models
             # The queried cars will be used in the <select> dropdown.
@@ -151,21 +152,37 @@ def add_review(request, dealer_id, short_name):
             #  call render method to render add_review.html.
             return render(request, 'djangoapp/add_review.html', context)
 
-            
-
-
-        
 
         if ( request.method == "POST" ):
             # update the json_payload["review"] to use the actual values obtained from the review form.
             # For review time,  use some datetime.utcnow().isoformat() to convert it into ISO format to be consistent with the format in
             # Cloudant. - For purchase, you may use car.year.strftime("%Y") to only get the year from the date field.
             # Update return statement to redirect user to the dealer details page once the review post is done for example.
-            print( request.content)
-            #redirect("djangoapp:dealer_details", dealer_id=dealer_id)   
+            print( request.POST["content"])
             
+            # Review text
+            review["review"] = request.POST["content"]
+            review["time"] = datetime.utcnow().isoformat()
+            # Dealer ID
+            review["dealer_id"] = dealer_id
+            # Reviwer Name
+            review["name"] = request.user.username
+            # Purchase (boolean)
+            review["purchase"] = False
+            if "purchasecheck" in request.POST:
+	                if request.POST["purchasecheck"] == 'on':
+	                    review["purchase"] = True
+            #Puchase date
+            review["purchase_date"] = request.POST["purchasedate"]
+            #Car make,model, year
+            car_ID  = request.POST["car"]
+            car = CarModel.objects.get(id=car_ID)
+            print(car)
+            review["car_make"] = car.model_make.make_name
+            review["car_model"] = car.model_name
+            review["car_year"] = car.model_year.strftime("%Y")
+            print( review )
 
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id, short_name=short_name)
 
-        review["time"] = datetime.utcnow().isoformat()
-        
 
