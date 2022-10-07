@@ -122,7 +122,7 @@ def get_dealer_details(request,dealer_id,short_name):
         dealer_reviews = get_dealer_reviews_from_cf( url, dealer_id )
         context["dealer_reviews"] = dealer_reviews
         # Return a list of reviews
-        #print(context)
+        print(context)
         return render(request, 'djangoapp/dealer_details.html', context)
 
 
@@ -164,7 +164,7 @@ def add_review(request, dealer_id, short_name):
             review["review"] = request.POST["content"]
             review["time"] = datetime.utcnow().isoformat()
             # Dealer ID
-            review["dealer_id"] = dealer_id
+            review["dealership"] = dealer_id
             # Reviwer Name
             review["name"] = request.user.username
             # Purchase (boolean)
@@ -182,6 +182,10 @@ def add_review(request, dealer_id, short_name):
             review["car_model"] = car.model_name
             review["car_year"] = car.model_year.strftime("%Y")
             print( review )
+            review_post = {}
+            review_post["review"] = review
+            review["id"] = 123456789
+            post_request(url=ADD_REVIEW_URL, json_payload=review_post )
 
             return redirect("djangoapp:dealer_details", dealer_id=dealer_id, short_name=short_name)
 

@@ -101,12 +101,12 @@ def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
     # Call get_request with a URL parameter
     reviews = get_request(url,dealerId=dealer_id)
-    #print( "json_result: ",json_result)
+    print( "reviews_fromc_f: ", reviews)
     if reviews:
         # Get the row list in JSON as dealers
         # For each dealer object
         for review in reviews:
-            #print("review: ", review)
+            print("review: ", review)
             review_obj = DealerReview(
                 name=review["name"],
                 dealer_id=review["dealership"],
