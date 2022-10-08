@@ -8,20 +8,22 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-
+    <style>
+        .navbar-brand
+        {
+             font-size: xx-large;
+        }
+    </style>
 </head>
     <body>
       <!-- Navigation bar -->
       <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">{{ short_name }}</a>
+                <a class="navbar-brand btn btn-link" href="{% url 'djangoapp:index' %}">Best Cars</a>
+                <h5> Add a review for {{short_name }}<h5>
             </div>
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
-                    <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>        
-                </li>
                 {% if user.is_authenticated %}
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
@@ -46,7 +48,7 @@
    
     <!--Add review form here -->
     {% if user.is_authenticated %}
-        <h4> {{user.username}}, your feedback is welcomed...</h4>
+        <h5>Your feedback is important to us, {{user.username}}. Add your review below.</h5>
         <div class="form-group">
             <form id="questionform" action="{% url 'djangoapp:add_review' dealer_id short_name %}" method="post">
                 {% csrf_token %}
@@ -77,6 +79,19 @@
     {% else %}
         <h3> You must be logged in to post a review...</h3>
     {% endif %}
+    <footer>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>        
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </footer>
+
     </body>
     <script type="text/javascript">
         $('#purchasedate').datepicker({

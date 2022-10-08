@@ -5,6 +5,12 @@
     <title>Dealership Review</title>
     {% load static %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .navbar-brand
+        {
+             font-size: xx-large;
+        }
+    </style>
 </head>
 
     <body>
@@ -14,13 +20,14 @@
       <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Reviews for {{ short_name }}</a>
+                <a class="navbar-brand btn btn-link" href="{% url 'djangoapp:index' %}">Best Cars</a>
+                {% if user.is_authenticated %}
+                    <h5>Reviews for {{ short_name }}</h5>
+                {% else %}
+                    <h5>Reviews for {{ short_name }}. Login or Sign-up to add yours!</h5>
+                {% endif %}
             </div>
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
-                    <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>        
-                </li>
                 {% if user.is_authenticated %}
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
@@ -50,7 +57,7 @@
         <div class="container-fluid">
             <div class="row">
                 {% for review in dealer_reviews %}
-                         <div class="card" style="width: 36rem;">
+                         <div class="card" style="width: 12rem;">
                         {% if review.sentiment == "positive"%}
                           <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png"  width="60px" height="60px"
                                alt="Positive image">
@@ -63,7 +70,7 @@
                         {% endif %}
                           <div class="card-body bg-light">
                             {%if review.purchase %}
-                                <h4 class="card-text">{{ review.car_make}} {{ review.car_model}}</h4>
+                                <h5 class="card-text">{{ review.car_make}} {{ review.car_model}}</h5>
                                 <h5 class="card-text">{{ review.car_year}}</h5>
                             {%endif%}
                         
@@ -75,8 +82,20 @@
             </div>
         </div>
     {% else %}
-        <p>No reviews are available.</p>
+        <h5>No reviews yet - Be the first to add a review!.</h5>
     {% endif %}
+    <footer>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>        
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </footer>
 
     </body>
 

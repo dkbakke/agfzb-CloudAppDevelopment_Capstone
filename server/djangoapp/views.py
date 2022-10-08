@@ -143,9 +143,9 @@ def add_review(request, dealer_id, short_name):
         if ( request.method == "GET" ):
             #  query the cars with the dealer id to be reviewed. 
             
-            car_models = CarModel.objects.filter(dealer_id=dealer_id)
+            car_models = CarModel.objects.all()
             #get(dealer_id=dealer_id)
-            print( car_models )
+            #print( car_models )
             context["cars"] = car_models
             # The queried cars will be used in the <select> dropdown.
             # append the queried cars into context
@@ -184,6 +184,7 @@ def add_review(request, dealer_id, short_name):
             print( review )
             review_post = {}
             review_post["review"] = review
+            #TODO fix reivew ID
             review["id"] = 123456789
             post_request(url=ADD_REVIEW_URL, json_payload=review_post )
 

@@ -40,12 +40,14 @@ class CarModel(models.Model):
     SEDAN = "sedan"
     SUV = "SUV"
     WAGON = "wagon"
-    TRUCK = "truck"     
+    TRUCK = "truck"
+    SPORTS = "sports"     
     VEHICLE_TYPE_CHOICES = [
         ( SEDAN,"sedan"),
         (SUV,"SUV"),
         (WAGON,"wagon"),
-        (TRUCK,"truck")
+        (TRUCK,"truck"),
+        ( SPORTS, "sports")
     ]
     vehicle_type = models.CharField( 
         null = False,
