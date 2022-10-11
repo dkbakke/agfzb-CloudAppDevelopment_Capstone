@@ -46,9 +46,9 @@ def get_request(url, **kwargs):
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 
 def post_request(url, json_payload, **kwargs):
-    print(kwargs)
-    print(json_payload)
-    print("POST to {} ".format(url))
+    #print(kwargs)
+    #print(json_payload)
+    #print("POST to {} ".format(url))
     response = {}
     
     try:
@@ -62,8 +62,8 @@ def post_request(url, json_payload, **kwargs):
         # If any error occurs
         print("Network exception occurred")
     # TODO Need more error checking
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
+    #status_code = response.status_code
+    #print("With status {} ".format(status_code))
     return response
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -75,7 +75,7 @@ def get_dealers_from_cf(url):
     results = []
     # Call get_request with a URL parameter
     json_result = get_request(url)
-    print( "from_cf json_result:", json_result)
+    #print( "from_cf json_result:", json_result)
     if json_result:
         # Get the row list in JSON as dealers
         dealers = json_result
@@ -101,24 +101,39 @@ def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
     # Call get_request with a URL parameter
     reviews = get_request(url,dealerId=dealer_id)
-    print( "reviews_fromc_f: ", reviews)
+    #print( "reviews_fromc_f: ", reviews)
     if reviews:
         # Get the row list in JSON as dealers
         # For each dealer object
         for review in reviews:
-            print("review: ", review)
-            review_obj = DealerReview(
-                name=review["name"],
-                dealer_id=review["dealership"],
-                review=review["review"],
-                purchase=review["purchase"],
-                purchase_date=review["purchase_date"],
-                car_make = review["car_make"],
-                car_model = review["car_model"],
-                car_year = review["car_year"],
-                review_id = review["id"],
-                sentiment= analyze_review_sentiments(review["review"])["sentiment"]["document"]["label"]
-            )
+            #print("review: ", review)
+            if ( "purchase" in review ):
+                if( review["purchase"] == True):
+                    review_obj = DealerReview(
+                        name=review["name"],
+                        dealer_id=review["dealership"],
+                        review=review["review"],
+                        purchase=review["purchase"],
+                        purchase_date=review["purchase_date"],
+                        car_make = review["car_make"],
+                        car_model = review["car_model"],
+                        car_year = review["car_year"],
+                        review_id = review["id"],
+                        sentiment= analyze_review_sentiments(review["review"])["sentiment"]["document"]["label"]
+                    )
+                else:
+                    review_obj = DealerReview(
+                        name=review["name"],
+                        dealer_id=review["dealership"],
+                        review=review["review"],
+                        purchase=review["purchase"],
+                        purchase_date="",
+                        car_make = "",
+                        car_model = "",
+                        car_year = "",
+                        review_id = review["id"],
+                        sentiment= analyze_review_sentiments(review["review"])["sentiment"]["document"]["label"]
+                    )
             #print( "\nsentiment:",review_obj.sentiment )
             results.append(review_obj)
 
